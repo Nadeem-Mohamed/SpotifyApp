@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spotify Artist Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='res_style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Spotify Artist Results</h1>
+        <div class="artist-info">
+            <h2>Artist Information</h2>
+            <p>Name: {{ artist.name }}</p>
+            <p>Followers: {{ artist.followers.total }}</p>
+            <p>Genres: {{ artist.genres|join(', ') }}</p>
+            <p>Popularity: {{ artist.popularity }}</p>
+        </div>
+        <h2>Top Songs</h2>
+        <ol>
+        {% for song in songs %}
+            <li>{{ song.name }}</li>
+        {% endfor %}
+        </ol>
+    </div>
+</body>
+</html>
