@@ -1,39 +1,62 @@
 /* Add your desired CSS styles for the index.html form here */
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #06283D;
+}
+
 .container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    position: relative;
+    width: 400px;
+    padding: 28px 32px;
+    overflow: hidden;
+    border-radius: 18px;
+    font-family: 'Roboto', sans-serif;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: 0.6s ease-out;
+}
+
+h1 {
+    color: #06283D;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
 label {
-    display: block;
-    margin-bottom: 10px;
+    color: #06283D;
+    font-size: 18px;
+    font-weight: 500;
 }
 
 input[type="text"] {
+    color: #06283D;
     width: 100%;
+    font-size: 16px;
+    font-weight: 400;
     padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
 input[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
+    cursor: pointer;
+    width: 100%;
+    background-color: #dff6ff;
+    color: #06283D;
+    padding: 10px 0;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    transition: 0.4s ease;
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-p.error-message {
-    color: red;
-    margin-top: 10px;
+    color: #fff;
+    background-color: #06283D;
 }

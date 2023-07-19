@@ -1,22 +1,54 @@
 /* Add your desired CSS styles for the results.html template here */
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #06283D;
 }
 
-.artist-info {
+.container {
+    position: relative;
+    width: 600px;
+    padding: 28px 32px;
+    overflow: hidden;
+    border-radius: 18px;
+    font-family: 'Roboto', sans-serif;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: 0.6s ease-out;
+}
+
+h1 {
+    color: #06283D;
+    font-size: 28px;
+    font-weight: 700;
     margin-bottom: 20px;
 }
 
+.artist-info {
+    margin-bottom: 30px;
+}
+
 h2 {
+    color: #06283D;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #06283D;
+    font-size: 18px;
+    font-weight: 400;
     margin-bottom: 10px;
 }
 
 ol {
+    color: #06283D;
     margin-left: 20px;
+    font-size: 18px;
+    font-weight: 400;
 }
 
 li {
