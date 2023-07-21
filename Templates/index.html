@@ -7,14 +7,25 @@
 <body>
     <div class="container">
         <h1>Spotify Artist Search</h1>
-        {% if error_message %}
-            <p style="color: red;">{{ error_message }}</p>
+        {% if spotify_username %}
+            <p>Welcome, {{ spotify_username }}!</p>
+        {% else %}
+            <a href="{{ url_for('spotify_login') }}"><button>Log in with Spotify</button></a>
         {% endif %}
         <form method="post">
             <label for="artist_name">Artist Name:</label>
             <input type="text" id="artist_name" name="artist_name" required>
             <input type="submit" value="Search">
         </form>
+        {% if result %}
+            <div class="artist-info">
+                <h2>Artist Information</h2>
+                <p>Name: {{ result.name }}</p>
+                <p>Followers: {{ result.followers.total }}</p>
+                <p>Genres: {{ result.genres|join(', ') }}</p>
+                <p>Popularity: {{ result.popularity }}</p>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>

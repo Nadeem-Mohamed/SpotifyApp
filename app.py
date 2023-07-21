@@ -1,16 +1,71 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from dotenv import load_dotenv
 import os
 import base64
 from requests import post, get
 import json
+from urllib.parse import urlencode
+
+
+
 
 app = Flask(__name__)
+app.secret_key = "Nadeem@04"
 load_dotenv()
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 
+@app.route("/spotify_login")
+def spotify_login():
+    scope = "user-read-private user-read-email"  
+    params = {
+        "client_id": client_id,
+        "response_type": "code",
+        "redirect_uri": "http://localhost:5000/spotify_callback",
+        "scope": scope,
+    }
+    query_string = urlencode(params)
+    auth_url = "https://accounts.spotify.com/authorize?" + query_string
+    return redirect(auth_url)
+
+@app.route("/spotify_callback")
+def spotify_callback():
+    auth_code = request.args.get("code")
+    if auth_code:
+        token_data = get_access_token(auth_code)
+        if token_data and "access_token" in token_data:
+            session["spotify_access_token"] = token_data["access_token"]
+            # Redirect to the index route after successful login
+            return redirect(url_for("index"))
+        else:
+            return "Error: Unable to get access token from Spotify."
+    else:
+        return "Error: No auth code received from Spotify."
+
+def get_access_token(auth_code):
+    url = "https://accounts.spotify.com/api/token"
+    data = {
+        "grant_type": "authorization_code",
+        "code": auth_code,
+        "redirect_uri": "http://localhost:5000/spotify_callback",  # Ensure this matches your registered Redirect URI
+        "client_id": client_id,
+        "client_secret": client_secret,
+    }
+    result = post(url, data=data)
+    print("Response status code:", result.status_code)
+    print("Response content:", result.content)
+    
+    if result.status_code == 200:
+        return json.loads(result.content)
+    return None
+
+
+def get_auth_header():
+    token = session.get("spotify_access_token")
+    if token:
+        return {"Authorization": "Bearer " + token}
+    return {}
 
 def get_token():
     auth_string = client_id + ":" + client_secret
@@ -56,8 +111,11 @@ def get_songs_by_artist(token, artist_id):
     return json_result
 
 
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
+    result = None  # Define result outside of the if block with an initial value
     if request.method == "POST":
         artist_name = request.form.get("artist_name")
         token = get_token()
@@ -72,8 +130,25 @@ def index():
                 "index.html", error_message="No artist found. Please try again."
             )
 
-    return render_template("index.html")
+    spotify_username = None
+    token = session.get("spotify_access_token")
+    if token:
+        user_info = get_user_info(token)
+        if user_info and "display_name" in user_info:
+            spotify_username = user_info["display_name"]
 
+    return render_template("index.html", spotify_username=spotify_username, result=result)
+
+
+def get_user_info(token):
+    url = "https://api.spotify.com/v1/me"
+    headers = get_auth_header(token)
+    result = get(url, headers=headers)
+    if result.status_code == 200:
+        return json.loads(result.content)
+    return None
+
+# ... (rest of the code remains the same)
 
 if __name__ == "__main__":
     app.run(debug=True)
