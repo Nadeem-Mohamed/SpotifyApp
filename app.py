@@ -36,7 +36,6 @@ def spotify_callback():
         token_data = get_access_token(auth_code)
         if token_data and "access_token" in token_data:
             session["spotify_access_token"] = token_data["access_token"]
-            # Redirect to the index route after successful login
             return redirect(url_for("index"))
         else:
             return "Error: Unable to get access token from Spotify."
@@ -48,7 +47,7 @@ def get_access_token(auth_code):
     data = {
         "grant_type": "authorization_code",
         "code": auth_code,
-        "redirect_uri": "http://localhost:5000/spotify_callback",  # Ensure this matches your registered Redirect URI
+        "redirect_uri": "http://localhost:5000/spotify_callback",  
         "client_id": client_id,
         "client_secret": client_secret,
     }
@@ -115,7 +114,7 @@ def get_songs_by_artist(token, artist_id):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    result = None  # Define result outside of the if block with an initial value
+    result = None  
     if request.method == "POST":
         artist_name = request.form.get("artist_name")
         token = get_token()
@@ -148,7 +147,6 @@ def get_user_info(token):
         return json.loads(result.content)
     return None
 
-# ... (rest of the code remains the same)
 
 if __name__ == "__main__":
     app.run(debug=True)
