@@ -107,7 +107,51 @@ def get_songs_by_artist(token, artist_id):
     headers = get_auth_header(token)
     result = get(url, headers=headers)
     json_result = json.loads(result.content)["tracks"]
+
+    playlists = get_user_playlists(token)
+
+    for track in json_result:
+        track["in_playlist"] = find_track_in_playlists(track, playlists)
+
     return json_result
+
+
+def get_user_playlists(token):
+    url = "https://api.spotify.com/v1/me/playlists"
+    headers = get_auth_header(token)
+    result = get(url, headers=headers)
+    json_result = json.loads(result.content)
+    playlists = json_result.get("items", []) 
+    print("User Playlists Response:", json_result)
+    return playlists
+
+
+def find_track_in_playlists(track, playlists):
+    track_id = track["id"]
+    for playlist in playlists:
+        playlist_tracks = get_playlist_tracks(playlist["id"])
+        for playlist_track in playlist_tracks:
+            if "track" in playlist_track and playlist_track["track"]["id"] == track_id:
+                return playlist["name"]
+    return None
+
+
+
+def get_playlist_tracks(playlist_id):
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+    headers = get_auth_header()
+    tracks = []
+
+    while url:
+        result = get(url, headers=headers)
+        json_result = json.loads(result.content)
+        tracks.extend(json_result.get("items", []))
+        url = json_result.get("next")
+
+    return tracks
+
+
+
 
 
 
