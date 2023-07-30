@@ -17,7 +17,11 @@
         <h2>Top Songs</h2>
         <ol>
         {% for song in songs %}
-            <li>{{ song.name }}</li>
+            <li>{{ song.name }}
+                {% if song.in_playlist %}
+                    <span class="playlist-info">In Playlist: {{ song.in_playlist }}</span>
+                {% endif %}
+            </li>
         {% endfor %}
         </ol>
     </div>
