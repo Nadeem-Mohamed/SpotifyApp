@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listening Habits</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='res_style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Listening Habits</h1>
+        <canvas id="genresChart" width="400" height="200"></canvas>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const genresData = JSON.parse('{{ top_genres_data|tojson|safe }}');
+            const genreCounts = {};
+
+          
+            for (const item of genresData) {
+                for (const genre of item.genre) {
+                    if (genreCounts[genre]) {
+                        genreCounts[genre] += item.count;
+                    } else {
+                        genreCounts[genre] = item.count;
+                    }
+                }
+            }
+
+            const genresLabels = Object.keys(genreCounts);
+            const genresCounts = Object.values(genreCounts);
+
+            var ctx = document.getElementById('genresChart').getContext('2d');
+            var genresChart = new Chart(ctx, {
+                type: 'bar', 
+                data: {
+                    labels: genresLabels,
+                    datasets: [{
+                        label: 'Number of Times Listened',
+                        data: genresCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stepSize: 1, 
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

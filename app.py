@@ -5,7 +5,7 @@ import base64
 from requests import post, get
 import json
 from urllib.parse import urlencode
-
+from flask import jsonify
 
 
 
@@ -18,7 +18,7 @@ client_secret = os.getenv("CLIENT_SECRET")
 
 @app.route("/spotify_login")
 def spotify_login():
-    scope = "user-read-private user-read-email"  
+    scope = "user-read-private user-read-email user-top-read"  
     params = {
         "client_id": client_id,
         "response_type": "code",
@@ -28,6 +28,7 @@ def spotify_login():
     query_string = urlencode(params)
     auth_url = "https://accounts.spotify.com/authorize?" + query_string
     return redirect(auth_url)
+
 
 @app.route("/spotify_callback")
 def spotify_callback():
@@ -47,17 +48,25 @@ def get_access_token(auth_code):
     data = {
         "grant_type": "authorization_code",
         "code": auth_code,
-        "redirect_uri": "http://localhost:5000/spotify_callback",  
+        "redirect_uri": "http://localhost:5000/spotify_callback",
         "client_id": client_id,
         "client_secret": client_secret,
     }
     result = post(url, data=data)
-    print("Response status code:", result.status_code)
-    print("Response content:", result.content)
-    
+
     if result.status_code == 200:
-        return json.loads(result.content)
+        try:
+            token_data = json.loads(result.content)
+            return token_data
+        except json.JSONDecodeError as e:
+            print("Error decoding JSON response:", e)
+    else:
+        print("Error: Unable to get access token from Spotify. Status code:", result.status_code)
+        print("Response content:", result.content)
     return None
+
+
+
 
 
 def get_auth_header():
@@ -190,6 +199,46 @@ def get_user_info(token):
     if result.status_code == 200:
         return json.loads(result.content)
     return None
+
+
+@app.route("/get_listening_habits")
+def get_listening_habits():
+    token = session.get("spotify_access_token")
+    if token:
+        top_genres_data = get_top_genres(token)
+        if top_genres_data:
+            return render_template("listening_habits.html", top_genres_data=top_genres_data)
+        else:
+            return "Error: Unable to retrieve top genres data."
+    else:
+        return redirect(url_for("spotify_login"))
+
+
+
+def get_top_genres(token):
+    url = "https://api.spotify.com/v1/me/top/artists"
+    headers = get_auth_header(token)
+    params = {
+        "time_range": "medium_term",  
+        "limit": 10,  
+    }
+    result = get(url, headers=headers, params=params)
+
+
+    if result.status_code == 200:
+        try:
+            json_result = result.json()
+            top_genres_data = [{"genre": artist["genres"], "count": artist["popularity"]} for artist in json_result["items"]]
+            return top_genres_data
+        except json.JSONDecodeError as e:
+            print("Error decoding JSON response:", e)
+    else:
+        print("Error: Unable to get top genres. Status code:", result.status_code)
+        print("Response content:", result.content)
+
+    return None
+
+
 
 
 if __name__ == "__main__":
