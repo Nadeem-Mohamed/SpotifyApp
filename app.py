@@ -7,14 +7,15 @@ import json
 from urllib.parse import urlencode
 from flask import jsonify
 
-
-
 app = Flask(__name__)
 app.secret_key = "Nadeem@04"
 load_dotenv()
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
+
+spotify_user_id = None
+
 
 @app.route("/spotify_login")
 def spotify_login():
@@ -119,48 +120,58 @@ def get_songs_by_artist(token, artist_id):
 
     playlists = get_user_playlists(token)
 
+    playlist_tracks = add_tracks_from_playlists(playlists, token)
     for track in json_result:
-        track["in_playlist"] = find_track_in_playlists(track, playlists)
-
+        track["in_playlist"] = find_track_in_playlists(track, playlist_tracks)
+  
     return json_result
 
 
 def get_user_playlists(token):
-    url = "https://api.spotify.com/v1/me/playlists"
+    url = "https://api.spotify.com/v1/users/{spotify_user_id}/playlists"
     headers = get_auth_header(token)
     result = get(url, headers=headers)
     json_result = json.loads(result.content)
     playlists = json_result.get("items", []) 
-    print("User Playlists Response:", json_result)
+    # print("User Playlists Response:", json_result)
     return playlists
 
+def add_tracks_from_playlists(playlists, token):
+    tracks = [dict() for x in range(len(playlists))]
+    for i in range(len(playlists)):
+        playlist_tracks = get_playlist_tracks(playlists[i]["id"], playlists[i]["tracks"]["total"], token)
+        tracks[i]["name"] = playlists[i]["name"]
+        track_ids = []
+        for track in playlist_tracks:
+            track_ids.append(track["track"]["id"])
+        tracks[i]["tracks"] = track_ids
+    return tracks
+        
 
 def find_track_in_playlists(track, playlists):
-    track_id = track["id"]
     for playlist in playlists:
-        playlist_tracks = get_playlist_tracks(playlist["id"])
-        for playlist_track in playlist_tracks:
-            if "track" in playlist_track and playlist_track["track"]["id"] == track_id:
-                return playlist["name"]
+        print(track['id'])
+        print(playlist["tracks"])
+        if(track['id'] in playlist["tracks"]):
+            return playlist["name"]
     return None
 
 
 
-def get_playlist_tracks(playlist_id):
+def get_playlist_tracks(playlist_id, playlist_length, token):
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-    headers = get_auth_header()
+    headers = get_auth_header(token)
+    fields = "fields=items.track.id"
     tracks = []
-
-    while url:
-        result = get(url, headers=headers)
+    
+    n = 0;
+    while n < playlist_length:
+        result = get(url + "?" + fields + "&" + "offset=" + str(n), headers=headers)
         json_result = json.loads(result.content)
         tracks.extend(json_result.get("items", []))
-        url = json_result.get("next")
+        n+=100;
 
     return tracks
-
-
-
 
 
 
@@ -182,12 +193,14 @@ def index():
                 "index.html", error_message="No artist found. Please try again."
             )
 
-    spotify_username = None
+    spotify_username = None 
     token = session.get("spotify_access_token")
     if token:
         user_info = get_user_info(token)
         if user_info and "display_name" in user_info:
             spotify_username = user_info["display_name"]
+        if user_info and "id" in user_info:
+            spotify_user_id = user_info["id"]
 
     return render_template("index.html", spotify_username=spotify_username, result=result)
 
@@ -223,7 +236,6 @@ def get_top_genres(token):
         "limit": 10,  
     }
     result = get(url, headers=headers, params=params)
-
 
     if result.status_code == 200:
         try:
