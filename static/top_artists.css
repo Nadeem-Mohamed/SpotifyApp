@@ -8,7 +8,7 @@ body {
 
 .container {
     position: relative;
-    width: 400px;
+    width: 600px;
     padding: 28px 32px;
     overflow: hidden;
     border-radius: 18px;
@@ -25,37 +25,39 @@ h1 {
     margin-bottom: 20px;
 }
 
-label {
+ul {
     color: #06283D;
     font-size: 18px;
-    font-weight: 500;
-}
-
-input[type="text"] {
-    color: #06283D;
-    width: 100%;
-    font-size: 16px;
     font-weight: 400;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    margin-left: 20px;
+    padding-left: 0;
 }
 
-input[type="submit"] {
-    cursor: pointer;
-    width: 100%;
-    background-color: #dff6ff;
+li {
+    margin-bottom: 5px;
+}
+
+/* Optional: Style the links inside the list */
+ul li a {
     color: #06283D;
-    padding: 10px 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: 500;
-    transition: 0.4s ease;
+    text-decoration: none;
 }
 
-input[type="submit"]:hover {
-    color: #fff;
-    background-color: #06283D;
+
+.artist-info {
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #06283D;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #06283D;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 10px;
 }
