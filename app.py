@@ -14,8 +14,6 @@ load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 
-spotify_user_id = None
-
 
 @app.route("/spotify_login")
 def spotify_login():
@@ -128,7 +126,13 @@ def get_songs_by_artist(token, artist_id):
 
 
 def get_user_playlists(token):
-    url = "https://api.spotify.com/v1/users/{spotify_user_id}/playlists"
+    token = session.get("spotify_access_token")
+    spotify_user_id = None
+    if token:
+        user_info = get_user_info(token)
+        if user_info and "id" in user_info:
+            spotify_user_id = user_info["id"]
+    url = f"https://api.spotify.com/v1/users/{spotify_user_id}/playlists"
     headers = get_auth_header(token)
     result = get(url, headers=headers)
     json_result = json.loads(result.content)
@@ -143,7 +147,10 @@ def add_tracks_from_playlists(playlists, token):
         tracks[i]["name"] = playlists[i]["name"]
         track_ids = []
         for track in playlist_tracks:
-            track_ids.append(track["track"]["id"])
+            try:
+                track_ids.append(track["track"]["id"])
+            except:
+                continue
         tracks[i]["tracks"] = track_ids
     return tracks
         
@@ -199,8 +206,6 @@ def index():
         user_info = get_user_info(token)
         if user_info and "display_name" in user_info:
             spotify_username = user_info["display_name"]
-        if user_info and "id" in user_info:
-            spotify_user_id = user_info["id"]
 
     return render_template("index.html", spotify_username=spotify_username, result=result)
 
@@ -259,7 +264,7 @@ def get_top_artists():
     token = get_token();
     genre = request.args.get('genre')
     headers = get_auth_header(token)
-    query = f"?q=genre:{genre}&type=artist&limit=10"  
+    query = f"?q=genre:{genre}&type=artist&limit=10"
 
     query_url = url + query
     result = get(query_url, headers=headers)
