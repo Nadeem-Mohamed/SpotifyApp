@@ -254,8 +254,10 @@ def get_top_genres(token):
 
 
 @app.route("/get_top_artists")
-def get_top_artists(token, genre):
+def get_top_artists():
     url = "https://api.spotify.com/v1/search"
+    token = get_token();
+    genre = request.args.get('genre')
     headers = get_auth_header(token)
     query = f"?q=genre:{genre}&type=artist&limit=10"  
 
