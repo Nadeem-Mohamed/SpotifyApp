@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Top Artists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='res_style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Top Artists in {{ selected_genre }}</h1>
+        <ul>
+        {% for artist in artists %}
+            <li>{{ artist.name }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

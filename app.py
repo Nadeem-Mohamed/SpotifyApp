@@ -150,11 +150,11 @@ def add_tracks_from_playlists(playlists, token):
 
 def find_track_in_playlists(track, playlists):
     for playlist in playlists:
-        print(track['id'])
-        print(playlist["tracks"])
-        if(track['id'] in playlist["tracks"]):
-            return playlist["name"]
+        for playlist_track in playlist["tracks"]:
+            if track['id'] == playlist_track:
+                return playlist["name"]
     return None
+
 
 
 
@@ -250,6 +250,19 @@ def get_top_genres(token):
 
     return None
 
+
+
+
+@app.route("/get_top_artists")
+def get_top_artists(token, genre):
+    url = "https://api.spotify.com/v1/search"
+    headers = get_auth_header(token)
+    query = f"?q=genre:{genre}&type=artist&limit=10"  
+
+    query_url = url + query
+    result = get(query_url, headers=headers)
+    json_result = json.loads(result.content)["artists"]["items"]
+    return json_result
 
 
 

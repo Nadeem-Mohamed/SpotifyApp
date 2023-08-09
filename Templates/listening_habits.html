@@ -8,6 +8,11 @@
 <body>
     <div class="container">
         <h1>Listening Habits</h1>
+        <div id="genreLinks">
+            {% for genre in top_genres_data %}
+                <a href="/get_top_artists?genre={{ genre.genre[0] }}">{{ genre.genre[0] }}</a><br>
+            {% endfor %}
+        </div>
         <canvas id="genresChart" width="400" height="200"></canvas>
     </div>
     <script>
@@ -15,7 +20,6 @@
             const genresData = JSON.parse('{{ top_genres_data|tojson|safe }}');
             const genreCounts = {};
 
-          
             for (const item of genresData) {
                 for (const genre of item.genre) {
                     if (genreCounts[genre]) {
