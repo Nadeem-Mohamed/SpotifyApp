@@ -269,7 +269,9 @@ def get_top_artists():
     query_url = url + query
     result = get(query_url, headers=headers)
     json_result = json.loads(result.content)["artists"]["items"]
-    return json_result
+    
+    artist_names = [artist["name"] for artist in json_result]
+    return jsonify(artist_names)
 
 
 
