@@ -8,11 +8,7 @@
 <body>
     <div class="container">
         <h1>Listening Habits</h1>
-        <div id="genreLinks">
-            {% for genre in top_genres_data %}
-                <a href="/get_top_artists?genre={{ genre.genre[0] }}">{{ genre.genre[0] }}</a><br>
-            {% endfor %}
-        </div>
+        
         <canvas id="genresChart" width="400" height="200"></canvas>
     </div>
     <script>
@@ -50,6 +46,12 @@
                         y: {
                             beginAtZero: true,
                             stepSize: 1, 
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const clickedGenre = genresLabels[elements[0].index];
+                            window.location.href = `/get_top_artists?genre=${clickedGenre}`;
                         }
                     }
                 }
