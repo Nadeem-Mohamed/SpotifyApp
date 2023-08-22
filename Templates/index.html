@@ -9,7 +9,7 @@
         <h1>Spotify Artist Search</h1>
         {% if spotify_username %}
             <p>Welcome, {{ spotify_username }}!</p>
-            <a href="{{ url_for('get_listening_habits') }}"><button>Get Listening Habits</button></a>
+            <a href="{{ url_for('get_listening_habits') }}"><button>My Listening Habits</button></a>
         {% else %}
             <a href="{{ url_for('spotify_login') }}"><button>Log in with Spotify</button></a>
         {% endif %}
